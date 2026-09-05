@@ -1,0 +1,9 @@
+1：这是去掉base_url最后的斜杠/，这样再加方法时加上/get等方法就不会变成//get。
+2：params: dict | None = None 这行代码表示参数要么是dict类型，要么为None，并且默认值为None，dict是
+可变对象，而python的默认参数只会创建一次。
+3：因为这样复用性高，把基础的base_url直接在初始化时封装到对象中了，这样每个方法用简单的单词就可以体现这个函数是
+什么功能。
+4：response.raise_for_status()表示再遇到错误的响应代码时会产生异常，然后用try/except能够捕捉异常，从而知道
+服务器返回了 HTTP 错误状态。。
+5：首先客户端client向服务器发送一个post请求，调用的方法是/post，请求的具体内容body是”什么是Agent“，将响应结果
+返回到result中。
