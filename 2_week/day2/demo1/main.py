@@ -1,0 +1,68 @@
+import asyncio
+
+from agent_config import LLMConfig
+from llm_client import LLMClient
+from state import AgentState
+from context_manager import ContextManager
+
+
+async def main():
+
+    config = LLMConfig()
+
+    client = LLMClient(
+        api_key=config.api_key,
+        base_url=config.base_url,
+        model=config.model
+    )
+
+    state = AgentState(
+        constraints={
+            "language": "Chinese",
+            "style": "beginner-friendly"
+        }
+    )
+
+    manager = ContextManager()
+
+    while True:
+
+        current_query = input(
+            "User: "
+        )
+
+        if current_query == "exit":
+            break
+
+        context = manager.build_context(
+            state=state,
+            current_query=current_query
+        )
+
+        answer = await client.stream_chat(
+            context
+        )
+
+        if answer is None:
+            print("Assistant: 请求失败")
+            continue
+
+        # print(
+        #     f"Assistant: {answer}"
+        # )
+
+        state.messages.append({
+            "role": "user",
+            "content": current_query
+        })
+
+        state.messages.append({
+            "role": "assistant",
+            "content": answer
+        })
+        await manager.summarize_history(client=client,
+                                        state=state,
+                                        recent_n=6)
+
+
+asyncio.run(main())
